@@ -13,6 +13,7 @@ These two free apps were designed for use in tandem and with these two devices:
 wit Motion WT901SDCL-BT50 (up to three)
 and
 Kestrel Drop D3 (up to three)
+
 When each device is physically paired with its counterpart device like this,
 
 Pair 1: D3-1 + WTSDCL-1
