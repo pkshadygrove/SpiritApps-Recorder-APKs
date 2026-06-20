@@ -5,18 +5,19 @@ Downloadable APK files for SpiritApps Recorder 2.5.
 
 Includes:
 
-SpiritMotion Recorder 2.5
-SpiritTemp Recorder 2.5
+1. SpiritMotion Recorder 2.5
+
+2. SpiritTemp Recorder 2.5
 
 These APK files are provided for direct Android installation.
 
 These two free apps were designed for use in tandem and with these two devices:
 
-wit Motion WT901SDCL-BT50 (up to three)
+1. wit Motion WT901SDCL-BT50 (up to three)
 
 and
 
-Kestrel Drop D3 (up to three)
+2. Kestrel Drop D3 (up to three)
 
 When each device is physically paired with its counterpart device like this,
 
