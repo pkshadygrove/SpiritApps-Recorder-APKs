@@ -7,6 +7,7 @@ Includes:
 
 SpiritMotion Recorder 2.5
 SpiritTemp Recorder 2.5
+
 These APK files are provided for direct Android installation.
 
 These two free apps were designed for use in tandem and with these two devices:
