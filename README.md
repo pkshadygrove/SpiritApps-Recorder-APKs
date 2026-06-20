@@ -16,8 +16,6 @@ If any D3 is left at 60 sec, quick temperature drop alerts for that device may b
 
 wit Motion WT901SDCL-BT50
 
-!!!IMPORTANT Kestrel D3 SETUP REMINDER!!!
-
 It is VERY important that each wit Motion WT901SDCL-BT50 device be properly calibrated before use.
 Be sure to follow the instructions in this video to properly calibrate each wit Motion WT901SDCL-BT50 device before using it.
 https://www.youtube.com/watch?v=XlbzjQw3slE&list=PL43tdDrVL_VC49nv2WW4NphnUTxSkQ_cZ&index=16
