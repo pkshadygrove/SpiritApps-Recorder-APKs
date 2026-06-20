@@ -20,7 +20,9 @@ Kestrel Drop D3 (up to three)
 When each device is physically paired with its counterpart device like this,
 
 Pair 1: D3-1 + WTSDCL-1
+
 Pair 2: D3-2 + WTSDCL-2
+
 Pair 3: D3-3 + WTSDCL-3
 
 the paranormal investigator can track 4 environmental conditions (vibration, EMF, temperature, and station/barometric pressure) in three locations simultaneously. When the device pair locations are entered into either app, the location information is automatically synced with the other app. When moving a device pair to another room/location, simply edit the location in one of the apps and it again syncs with the other app.
