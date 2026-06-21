@@ -1,0 +1,163 @@
+name: APK Download Report
+
+on:
+  workflow_dispatch:
+  schedule:
+    # Hourly at 6 minutes after the hour.
+    # This avoids the top-of-hour GitHub Actions load window.
+    - cron: "6 * * * *"
+
+permissions:
+  contents: read
+
+jobs:
+  send-report:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Fetch download counts and email report
+        env:
+          SMTP_USERNAME: ${{ secrets.SMTP_USERNAME }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+          REPORT_TO: ${{ secrets.REPORT_TO }}
+          REPORT_FROM: ${{ secrets.SMTP_USERNAME }}
+        run: |
+          python3 - <<'PY'
+          import json
+          import os
+          import smtplib
+          import sys
+          import urllib.error
+          import urllib.request
+          from datetime import datetime
+          from email.message import EmailMessage
+          from zoneinfo import ZoneInfo
+
+          ENDPOINT = "https://api.github.com/repos/pkshadygrove/SpiritApps-Recorder-APKs/releases"
+          TZ = ZoneInfo("America/Los_Angeles")
+
+          def checked_time() -> str:
+              now = datetime.now(TZ)
+              # Example: June 20, 2026, 6:00 PM Pacific
+              return f"{now.strftime('%B')} {now.day}, {now.year}, {now.strftime('%-I:%M %p')} Pacific"
+
+          def build_success_report(releases) -> str:
+              assets = []
+              for release in releases:
+                  for asset in release.get("assets", []):
+                      assets.append({
+                          "name": asset.get("name", "(unnamed asset)"),
+                          "download_count": asset.get("download_count", "unknown"),
+                      })
+
+              lines = [
+                  "APK Download Report",
+                  "",
+                  f"Checked: {checked_time()}",
+                  "",
+                  "Asset name | Current download_count",
+                  "--- | ---:",
+              ]
+
+              if assets:
+                  for asset in assets:
+                      lines.append(f"{asset['name']} | {asset['download_count']}")
+              else:
+                  lines.append("(No release assets found) | 0")
+
+              lines += [
+                  "",
+                  "Note: GitHub download_count is cumulative for each release asset and does not identify individual downloaders.",
+              ]
+              return "\n".join(lines)
+
+          def build_failure_report(error_text: str) -> str:
+              return "\n".join([
+                  "APK Download Report",
+                  "",
+                  f"Checked: {checked_time()}",
+                  "",
+                  "CURRENT API CHECK FAILED",
+                  "",
+                  "GitHub Releases API endpoint:",
+                  ENDPOINT,
+                  "",
+                  "Error/status:",
+                  error_text,
+                  "",
+                  "No current release JSON was retrieved during this run, so no download counts are listed.",
+                  "",
+                  "Do not rely on any previous snapshot for this report.",
+              ])
+
+          def fetch_releases():
+              request = urllib.request.Request(
+                  ENDPOINT,
+                  headers={
+                      "Accept": "application/vnd.github+json",
+                      "User-Agent": "SpiritApps-APK-Download-Report",
+                  },
+              )
+              try:
+                  with urllib.request.urlopen(request, timeout=30) as response:
+                      status = response.status
+                      body = response.read().decode("utf-8")
+                  if status != 200:
+                      raise RuntimeError(f"HTTP {status}")
+                  data = json.loads(body)
+                  if not isinstance(data, list):
+                      raise RuntimeError("GitHub API returned JSON, but it was not a release list.")
+                  return data, None
+              except urllib.error.HTTPError as e:
+                  try:
+                      error_body = e.read().decode("utf-8")
+                  except Exception:
+                      error_body = ""
+                  return None, f"HTTP {e.code} {e.reason}. {error_body}".strip()
+              except Exception as e:
+                  return None, f"{type(e).__name__}: {e}"
+
+          def send_email(body: str):
+              smtp_username = os.environ.get("SMTP_USERNAME", "").strip()
+              smtp_password = os.environ.get("SMTP_PASSWORD", "").strip()
+              report_to = os.environ.get("REPORT_TO", "").strip()
+              report_from = os.environ.get("REPORT_FROM", "").strip() or smtp_username
+
+              missing = [
+                  name for name, value in [
+                      ("SMTP_USERNAME", smtp_username),
+                      ("SMTP_PASSWORD", smtp_password),
+                      ("REPORT_TO", report_to),
+                  ]
+                  if not value
+              ]
+              if missing:
+                  raise RuntimeError(f"Missing required GitHub secret(s): {', '.join(missing)}")
+
+              msg = EmailMessage()
+              msg["Subject"] = "APK Download Report"
+              msg["From"] = report_from
+              msg["To"] = report_to
+              msg.set_content(body)
+
+              with smtplib.SMTP("smtp.gmail.com", 587, timeout=30) as smtp:
+                  smtp.ehlo()
+                  smtp.starttls()
+                  smtp.ehlo()
+                  smtp.login(smtp_username, smtp_password)
+                  smtp.send_message(msg)
+
+          releases, error = fetch_releases()
+          if error:
+              report_body = build_failure_report(error)
+          else:
+              report_body = build_success_report(releases)
+
+          print(report_body)
+
+          try:
+              send_email(report_body)
+          except Exception as e:
+              print(f"EMAIL SEND FAILED: {type(e).__name__}: {e}", file=sys.stderr)
+              raise
+          PY
