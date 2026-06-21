@@ -9,7 +9,7 @@ on:
     #  timezone: "America/Los_Angeles"
     # Hourly at 6 minutes after the hour.
     # This avoids the top-of-hour GitHub Actions load window.
-    - cron: "6 * * * *"
+     - cron: "6 * * * *"
     #
 
 permissions:
