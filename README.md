@@ -1,7 +1,7 @@
 # SpiritApps-Recorder-APKs
-Apps for use with Kestrel Drop D3 and wit Motion WT901SDCL-BT50 Devices
+Download SpiritMotion Recorder 2.5 and SpiritTemp Recorder 2.5 APKs for Android. Record EMF, vibration, temperature, and pressure data for paranormal investigations.
 
-Downloadable APK files for SpiritApps Recorder 2.5.
+Apps for use with Kestrel Drop D3 and wit Motion WT901SDCL-BT50 Devices
 
 Includes:
 
